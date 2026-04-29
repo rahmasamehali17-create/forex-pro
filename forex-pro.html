@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ForexPro — منصة التداول الاحترافية</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8D08A;
+    --gold-dark: #8B6914;
+    --navy: #0A0F1E;
+    --navy-2: #111827;
+    --navy-3: #1A2340;
+    --navy-4: #232D4A;
+    --navy-5: #2C3960;
+    --teal: #00C9A7;
+    --teal-dark: #00906E;
+    --red: #FF4757;
+    --green: #2ED573;
+    --text-primary: #F0F4FF;
+    --text-secondary: #8A9BC5;
+    --text-muted: #4A5880;
+    --border: rgba(201,168,76,0.2);
+    --border-hover: rgba(201,168,76,0.5);
+    --card-bg: rgba(26,35,64,0.8);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Cairo',sans-serif; background:var(--navy); color:var(--text-primary); overflow-x:hidden; }
+
+  /* ===== PAGE SYSTEM ===== */
+  .page { display:none; min-height:100vh; }
+  .page.active { display:flex; }
+
+  /* ===== LOGIN PAGE ===== */
+  #loginPage {
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+    background: radial-gradient(ellipse at 20% 50%, rgba(0,201,167,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(201,168,76,0.1) 0%, transparent 50%),
+                var(--navy);
+    position:relative;
+    overflow:hidden;
+  }
+  #loginPage::before {
+    content:'';
+    position:absolute; inset:0;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 60px,
+      rgba(201,168,76,0.03) 60px, rgba(201,168,76,0.03) 61px
+    ),
+    repeating-linear-gradient(
+      90deg, transparent, transparent 60px,
+      rgba(201,168,76,0.03) 60px, rgba(201,168,76,0.03) 61px
+    );
+  }
+  .login-container {
+    width:100%; max-width:520px; padding:2rem;
+    position:relative; z-index:2;
+  }
+  .login-logo {
+    text-align:center; margin-bottom:2.5rem;
+  }
+  .login-logo .brand {
+    font-family:'Oswald',sans-serif;
+    font-size:2.8rem; font-weight:600; letter-spacing:4px;
+    background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    background-clip:text;
+  }
+  .login-logo .brand span { color:var(--teal); -webkit-text-fill-color:var(--teal); }
+  .login-logo p {
+    color:var(--text-secondary); font-size:0.85rem; letter-spacing:3px;
+    text-transform:uppercase; margin-top:0.3rem;
+  }
+  .login-card {
+    background: rgba(17,24,39,0.95);
+    border:1px solid var(--border);
+    border-radius:16px; padding:2.5rem;
+    backdrop-filter:blur(20px);
+    box-shadow: 0 0 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,168,76,0.05);
+  }
+  .login-card h2 {
+    font-size:1.3rem; font-weight:700; margin-bottom:0.4rem; text-align:center;
+  }
+  .login-card .subtitle {
+    text-align:center; color:var(--text-secondary); font-size:0.85rem; margin-bottom:2rem;
+  }
+  .form-group { margin-bottom:1.2rem; }
+  .form-group label {
+    display:block; font-size:0.8rem; color:var(--text-secondary);
+    margin-bottom:0.5rem; font-weight:600; letter-spacing:1px;
+  }
+  .form-group input, .form-group select {
+    width:100%; padding:0.8rem 1rem;
+    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);
+    border-radius:8px; color:var(--text-primary); font-family:'Cairo',sans-serif;
+    font-size:0.9rem; transition:all 0.3s; outline:none;
+    -webkit-appearance:none; appearance:none;
+  }
+  .form-group select {
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A9BC5' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:left 1rem center;
+    padding-left:2.5rem;
+  }
+  .form-group input:focus, .form-group select:focus {
+    border-color:var(--gold); background:rgba(201,168,76,0.05);
+    box-shadow:0 0 0 3px rgba(201,168,76,0.1);
+  }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  .btn-login {
+    width:100%; padding:1rem;
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    border:none; border-radius:8px; color:#0A0F1E;
+    font-family:'Cairo',sans-serif; font-size:1rem; font-weight:900;
+    cursor:pointer; letter-spacing:1px; margin-top:0.5rem;
+    transition:all 0.3s; position:relative; overflow:hidden;
+  }
+  .btn-login:hover {
+    transform:translateY(-2px);
+    box-shadow:0 8px 30px rgba(201,168,76,0.4);
+  }
+  .btn-login::after {
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+    opacity:0; transition:opacity 0.3s;
+  }
+  .btn-login:hover::after { opacity:1; }
+  .login-footer {
+    text-align:center; margin-top:1.5rem;
+    color:var(--text-secondary); font-size:0.8rem;
+  }
+  .login-footer a { color:var(--gold); text-decoration:none; }
+  .ticker-bar {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:rgba(10,15,30,0.95); border-bottom:1px solid var(--border);
+    padding:0.4rem 0; overflow:hidden;
+    backdrop-filter:blur(10px);
+  }
+  .ticker-inner {
+    display:flex; gap:3rem; animation:ticker 30s linear infinite;
+    white-space:nowrap; padding:0 2rem;
+  }
+  .ticker-item { font-size:0.78rem; display:flex; gap:0.5rem; align-items:center; }
+  .ticker-pair { color:var(--text-secondary); font-weight:600; }
+  .ticker-price { color:var(--text-primary); font-weight:700; }
+  .up { color:var(--green); }
+  .down { color:var(--red); }
+  @keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+  .login-container { margin-top:50px; }
+
+  /* ===== DASHBOARD PAGE ===== */
+  #dashPage {
+    flex-direction:row; min-height:100vh;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width:72px; background:var(--navy-2);
+    border-left:1px solid var(--border);
+    display:flex; flex-direction:column;
+    align-items:center; padding:1rem 0;
+    position:fixed; top:0; right:0; bottom:0; z-index:50;
+    gap:0.3rem;
+  }
+  .sidebar-logo {
+    font-family:'Oswald',sans-serif; font-size:1.1rem; font-weight:600;
+    color:var(--gold); letter-spacing:2px; margin-bottom:1.5rem;
+    writing-mode:vertical-rl;
+  }
+  .nav-icon {
+    width:48px; height:48px; border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; transition:all 0.2s; position:relative;
+    color:var(--text-muted);
+  }
+  .nav-icon:hover { background:rgba(201,168,76,0.1); color:var(--gold); }
+  .nav-icon.active { background:rgba(201,168,76,0.15); color:var(--gold); }
+  .nav-icon svg { width:22px; height:22px; }
+  .nav-icon .tooltip {
+    position:absolute; right:calc(100% + 12px); top:50%; transform:translateY(-50%);
+    background:var(--navy-3); border:1px solid var(--border);
+    color:var(--text-primary); font-size:0.75rem; font-family:'Cairo',sans-serif;
+    padding:0.3rem 0.7rem; border-radius:6px; white-space:nowrap;
+    opacity:0; pointer-events:none; transition:opacity 0.2s;
+  }
+  .nav-icon:hover .tooltip { opacity:1; }
+  .sidebar-divider { width:40px; height:1px; background:var(--border); margin:0.5rem 0; }
+  .sidebar-bottom { margin-top:auto; }
+
+  /* MAIN CONTENT */
+  .main-content {
+    flex:1; margin-right:72px; padding:0;
+    display:flex; flex-direction:column; min-height:100vh;
+  }
+
+  /* TOP BAR */
+  .topbar {
+    height:60px; background:rgba(10,15,30,0.95);
+    border-bottom:1px solid var(--border);
+    display:flex; align-items:center;
+    padding:0 1.5rem; gap:1rem;
+    position:sticky; top:0; z-index:40;
+    backdrop-filter:blur(10px);
+  }
+  .topbar-brand {
+    font-family:'Oswald',sans-serif; font-size:1.4rem;
+    color:var(--gold); letter-spacing:3px; margin-left:auto;
+  }
+  .topbar-right { display:flex; align-items:center; gap:1rem; }
+  .topbar-badge {
+    padding:0.3rem 0.8rem; border-radius:20px;
+    font-size:0.75rem; font-weight:700;
+    background:rgba(0,201,167,0.15); color:var(--teal);
+    border:1px solid rgba(0,201,167,0.3);
+  }
+  .topbar-user {
+    display:flex; align-items:center; gap:0.5rem;
+    cursor:pointer;
+  }
+  .user-avatar {
+    width:36px; height:36px; border-radius:50%;
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    display:flex; align-items:center; justify-content:center;
+    font-weight:900; font-size:0.85rem; color:var(--navy);
+  }
+  .user-name { font-size:0.85rem; font-weight:600; }
+
+  /* BANNER */
+  .banner-section { padding:1rem 1.5rem 0; }
+  .banner-tabs { display:flex; gap:0.5rem; margin-bottom:1rem; }
+  .banner-tab {
+    padding:0.5rem 1.2rem; border-radius:8px; font-size:0.82rem;
+    font-weight:700; cursor:pointer; transition:all 0.2s;
+    border:1px solid transparent; font-family:'Cairo',sans-serif;
+  }
+  .banner-tab.active {
+    background:rgba(201,168,76,0.15); color:var(--gold);
+    border-color:var(--border);
+  }
+  .banner-tab:not(.active) { color:var(--text-muted); }
+  .banner-tab:not(.active):hover { color:var(--text-secondary); background:rgba(255,255,255,0.03); }
+  .banner {
+    background: linear-gradient(135deg, var(--navy-3) 0%, var(--navy-4) 50%, rgba(201,168,76,0.08) 100%);
+    border:1px solid var(--border); border-radius:16px;
+    padding:2rem 2.5rem; position:relative; overflow:hidden;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .banner::before {
+    content:''; position:absolute; top:-50%; right:-10%;
+    width:300px; height:300px; border-radius:50%;
+    background:radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%);
+  }
+  .banner-text h2 { font-size:1.6rem; font-weight:900; line-height:1.3; }
+  .banner-text h2 span { color:var(--gold); }
+  .banner-text p { color:var(--text-secondary); font-size:0.9rem; margin-top:0.5rem; }
+  .banner-actions { display:flex; gap:0.8rem; margin-top:1.2rem; }
+  .btn-primary {
+    padding:0.7rem 1.5rem; background:linear-gradient(135deg, var(--gold), var(--gold-dark));
+    border:none; border-radius:8px; color:var(--navy); font-family:'Cairo',sans-serif;
+    font-weight:900; font-size:0.85rem; cursor:pointer; transition:all 0.2s;
+  }
+  .btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(201,168,76,0.3); }
+  .btn-outline {
+    padding:0.7rem 1.5rem; background:transparent;
+    border:1px solid var(--border); border-radius:8px; color:var(--gold);
+    font-family:'Cairo',sans-serif; font-weight:700; font-size:0.85rem; cursor:pointer;
+    transition:all 0.2s;
+  }
+  .btn-outline:hover { background:rgba(201,168,76,0.08); border-color:var(--border-hover); }
+  .banner-stat {
+    text-align:center; position:relative; z-index:2;
+  }
+  .banner-stat .val {
+    font-size:2.5rem; font-weight:900;
+    background:linear-gradient(135deg, var(--gold-light), var(--gold));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  }
+  .banner-stat .lbl { font-size:0.78rem; color:var(--text-secondary); margin-top:0.2rem; }
+
+  /* CONTENT GRID */
+  .content-grid {
+    display:grid; grid-template-columns:1fr 320px;
+    gap:1rem; padding:1rem 1.5rem; flex:1;
+  }
+  .left-col { display:flex; flex-direction:column; gap:1rem; }
+  .right-col { display:flex; flex-direction:column; gap:1rem; }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-size:0.78rem; font-weight:700; color:var(--text-secondary);
+    letter-spacing:2px; text-transform:uppercase; margin-bottom:0.8rem;
+    display:flex; align-items:center; gap:0.5rem;
+  }
+  .section-title::after {
+    content:''; flex:1; height:1px; background:var(--border);
+  }
+
+  /* STATS ROW */
+  .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:0.8rem; }
+  .stat-card {
+    background:var(--navy-3); border:1px solid var(--border);
+    border-radius:12px; padding:1rem 1.2rem;
+    transition:all 0.2s;
+  }
+  .stat-card:hover { border-color:var(--border-hover); transform:translateY(-2px); }
+  .stat-card .s-label { font-size:0.72rem; color:var(--text-secondary); font-weight:600; letter-spacing:1px; }
+  .stat-card .s-val {
+    font-size:1.5rem; font-weight:900; margin:0.3rem 0;
+    font-family:'Oswald',sans-serif; letter-spacing:1px;
+  }
+  .stat-card .s-change { font-size:0.75rem; font-weight:700; }
+  .stat-card.gold .s-val { color:var(--gold); }
+  .stat-card.teal .s-val { color:var(--teal); }
+  .stat-card.green .s-val { color:var(--green); }
+  .stat-card.red .s-val { color:var(--red); }
+
+  /* CHART AREA */
+  .chart-card {
+    background:var(--navy-3); border:1px solid var(--border);
+    border-radius:12px; padding:1.2rem;
+  }
+  .chart-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; }
+  .chart-title { font-size:0.95rem; font-weight:700; }
+  .chart-pair { font-size:0.8rem; color:var(--teal); font-weight:700; }
+  .chart-body { height:180px; position:relative; overflow:hidden; }
+  .chart-svg { width:100%; height:100%; }
+
+  /* AD AREAS */
+  .ad-card {
+    border-radius:12px; overflow:hidden; position:relative;
+    border:1px solid var(--border);
+  }
+  .ad-card.tall { height:200px; }
+  .ad-card.wide { height:100px; }
+  .ad-inner {
+    width:100%; height:100%;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    font-size:0.75rem; color:var(--text-muted);
+    letter-spacing:2px; text-transform:uppercase;
+    background:rgba(255,255,255,0.02);
+    border:2px dashed rgba(255,255,255,0.06);
+    border-radius:10px; gap:0.5rem;
+    transition:all 0.2s;
+  }
+  .ad-inner:hover { background:rgba(255,255,255,0.04); border-color:rgba(201,168,76,0.15); }
+  .ad-inner svg { width:28px; height:28px; opacity:0.3; }
+  .ad-label { font-size:0.68rem; color:var(--text-muted); }
+
+  /* MARKET TABLE */
+  .market-table { width:100%; border-collapse:collapse; }
+  .market-table th {
+    font-size:0.7rem; color:var(--text-muted); font-weight:600;
+    letter-spacing:1px; text-transform:uppercase;
+    padding:0.5rem 0.8rem; border-bottom:1px solid var(--border); text-align:right;
+  }
+  .market-table td {
+    padding:0.7rem 0.8rem; font-size:0.82rem;
+    border-bottom:1px solid rgba(255,255,255,0.03);
+  }
+  .market-table tr:hover td { background:rgba(255,255,255,0.02); }
+  .pair-name { font-weight:700; }
+  .pair-flag { font-size:1rem; margin-left:0.3rem; }
+  .price-cell { font-family:'Oswald',sans-serif; font-size:0.9rem; font-weight:600; }
+  .spread { font-size:0.75rem; color:var(--text-muted); }
+  .buy-btn, .sell-btn {
+    padding:0.3rem 0.7rem; border-radius:5px;
+    font-size:0.72rem; font-weight:700; cursor:pointer;
+    font-family:'Cairo',sans-serif; border:none; transition:all 0.2s;
+  }
+  .buy-btn { background:rgba(46,213,115,0.15); color:var(--green); }
+  .buy-btn:hover { background:rgba(46,213,115,0.25); }
+  .sell-btn { background:rgba(255,71,87,0.15); color:var(--red); }
+  .sell-btn:hover { background:rgba(255,71,87,0.25); }
+
+  /* NEWS CARD */
+  .news-card {
+    background:var(--navy-3); border:1px solid var(--border);
+    border-radius:12px; padding:1rem;
+  }
+  .news-item {
+    padding:0.7rem 0; border-bottom:1px solid rgba(255,255,255,0.04);
+    cursor:pointer; transition:all 0.2s;
+  }
+  .news-item:last-child { border-bottom:none; padding-bottom:0; }
+  .news-item:hover { padding-right:0.3rem; }
+  .news-item .n-time { font-size:0.68rem; color:var(--gold); margin-bottom:0.3rem; font-weight:700; }
+  .news-item .n-title { font-size:0.82rem; font-weight:600; line-height:1.4; }
+  .news-item .n-src { font-size:0.7rem; color:var(--text-muted); margin-top:0.2rem; }
+
+  /* SOCIAL FOOTER */
+  .social-footer {
+    background:var(--navy-2); border-top:1px solid var(--border);
+    padding:1.5rem 2rem;
+  }
+  .social-footer-inner {
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;
+  }
+  .social-brand {
+    font-family:'Oswald',sans-serif; font-size:1.4rem; color:var(--gold); letter-spacing:3px;
+  }
+  .social-links { display:flex; gap:0.8rem; }
+  .social-btn {
+    width:44px; height:44px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    border:1px solid var(--border); cursor:pointer; transition:all 0.25s;
+    text-decoration:none; color:var(--text-secondary);
+    background:rgba(255,255,255,0.03);
+  }
+  .social-btn svg { width:20px; height:20px; }
+  .social-btn.fb:hover { background:rgba(24,119,242,0.15); border-color:rgba(24,119,242,0.4); color:#1877F2; }
+  .social-btn.ig:hover { background:rgba(225,48,108,0.15); border-color:rgba(225,48,108,0.4); color:#E1306C; }
+  .social-btn.tg:hover { background:rgba(0,136,204,0.15); border-color:rgba(0,136,204,0.4); color:#0088CC; }
+  .social-btn.tk:hover { background:rgba(105,201,208,0.15); border-color:rgba(105,201,208,0.4); color:#69C9D0; }
+  .social-copy { font-size:0.75rem; color:var(--text-muted); }
+  .social-disclaimer { font-size:0.68rem; color:var(--text-muted); max-width:400px; line-height:1.5; }
+  .legal-links { display:flex; gap:1rem; }
+  .legal-links a { font-size:0.72rem; color:var(--text-muted); text-decoration:none; }
+  .legal-links a:hover { color:var(--gold); }
+
+  /* LIVE DOT */
+  .live-dot {
+    width:8px; height:8px; border-radius:50%; background:var(--green);
+    animation:pulse-green 2s infinite; display:inline-block;
+  }
+  @keyframes pulse-green {
+    0%,100%{box-shadow:0 0 0 0 rgba(46,213,115,0.4)}
+    50%{box-shadow:0 0 0 6px rgba(46,213,115,0)}
+  }
+</style>
+</head>
+<body>
+
+<!-- TICKER BAR -->
+<div class="ticker-bar">
+  <div class="ticker-inner" id="ticker">
+    <span class="ticker-item"><span class="ticker-pair">EUR/USD</span><span class="ticker-price">1.0847</span><span class="up">▲ +0.12%</span></span>
+    <span class="ticker-item"><span class="ticker-pair">GBP/USD</span><span class="ticker-price">1.2643</span><span class="down">▼ -0.08%</span></span>
+    <span class="ticker-item"><span class="ticker-pair">USD/JPY</span><span class="ticker-price">149.72</span><span class="up">▲ +0.23%</span></span>
+    <span class="ticker-item"><span class="ticker-pair">XAU/USD</span><span class="ticker-price">2,338.40</span><span class="up">▲ +0.54%</span></span>
+    <span class="ticker-item"><span class="ticker-pair">USD/CHF</span><span class="ticker-price">0.9012</span><span class="down">▼ -0.15%</span></span>
+    <span class="ticker-item"><span class="ticker-pair">AUD/USD</span><span class="ticker-price">0.6521</span><span class="up">▲ +0.07%</span></span>
+    <span class="ticker-item"><span class="ticker-pair">USD/CAD</span><span class="ticker-price">1.3654</span><span class="up">▲ +0.11%</span></span>
+    <span class="ticker-item"><span class="ticker-pair">NZD/USD</span><span class="ticker-price">0.5987</span><span class="down">▼ -0.03%</span></span>
+    <span class="ticker-item"><span class="ticker-pair">BTC/USD</span><span class="ticker-price">67,450</span><span class="up">▲ +1.8%</span></span>
+    <span class="ticker-item"><span class="ticker-pair">EUR/GBP</span><span class="ticker-price">0.8580</span><span class="down">▼ -0.05%</span></span>
+    <!-- Duplicate for seamless loop -->
+    <span class="ticker-item"><span class="ticker-pair">EUR/USD</span><span class="ticker-price">1.0847</span><span class="up">▲ +0.12%</span></span>
+    <span class="ticker-item"><span class="ticker-pair">GBP/USD</span><span class="ticker-price">1.2643</span><span class="down">▼ -0.08%</span></span>
+    <span class="ticker-item"><span class="ticker-pair">USD/JPY</span><span class="ticker-price">149.72</span><span class="up">▲ +0.23%</span></span>
+    <span class="ticker-item"><span class="ticker-pair">XAU/USD</span><span class="ticker-price">2,338.40</span><span class="up">▲ +0.54%</span></span>
+    <span class="ticker-item"><span class="ticker-pair">USD/CHF</span><span class="ticker-price">0.9012</span><span class="down">▼ -0.15%</span></span>
+    <span class="ticker-item"><span class="ticker-pair">AUD/USD</span><span class="ticker-price">0.6521</span><span class="up">▲ +0.07%</span></span>
+    <span class="ticker-item"><span class="ticker-pair">USD/CAD</span><span class="ticker-price">1.3654</span><span class="up">▲ +0.11%</span></span>
+    <span class="ticker-item"><span class="ticker-pair">NZD/USD</span><span class="ticker-price">0.5987</span><span class="down">▼ -0.03%</span></span>
+    <span class="ticker-item"><span class="ticker-pair">BTC/USD</span><span class="ticker-price">67,450</span><span class="up">▲ +1.8%</span></span>
+    <span class="ticker-item"><span class="ticker-pair">EUR/GBP</span><span class="ticker-price">0.8580</span><span class="down">▼ -0.05%</span></span>
+  </div>
+</div>
+
+<!-- ===== PAGE 1: LOGIN ===== -->
+<div id="loginPage" class="page active">
+  <div class="login-container">
+    <div class="login-logo">
+      <div class="brand">FOREX<span>PRO</span></div>
+      <p>منصة التداول الاحترافية</p>
+    </div>
+    <div class="login-card">
+      <h2>إنشاء حساب جديد</h2>
+      <p class="subtitle">انضم لآلاف المتداولين المحترفين</p>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>الاسم الأول</label>
+          <input type="text" placeholder="محمد" />
+        </div>
+        <div class="form-group">
+          <label>الاسم الثاني</label>
+          <input type="text" placeholder="أحمد" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>اسم العائلة</label>
+        <input type="text" placeholder="الخالدي" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>الدولة</label>
+          <select id="countrySelect">
+            <option value="">— اختر دولتك —</option>
+            <optgroup label="الدول العربية">
+              <option>مصر 🇪🇬</option><option>السعودية 🇸🇦</option><option>الإمارات 🇦🇪</option>
+              <option>الكويت 🇰🇼</option><option>قطر 🇶🇦</option><option>البحرين 🇧🇭</option>
+              <option>عُمان 🇴🇲</option><option>الأردن 🇯🇴</option><option>لبنان 🇱🇧</option>
+              <option>العراق 🇮🇶</option><option>سوريا 🇸🇾</option><option>اليمن 🇾🇪</option>
+              <option>ليبيا 🇱🇾</option><option>تونس 🇹🇳</option><option>الجزائر 🇩🇿</option>
+              <option>المغرب 🇲🇦</option><option>السودان 🇸🇩</option><option>فلسطين 🇵🇸</option>
+            </optgroup>
+            <optgroup label="أوروبا">
+              <option>ألمانيا 🇩🇪</option><option>فرنسا 🇫🇷</option><option>المملكة المتحدة 🇬🇧</option>
+              <option>إيطاليا 🇮🇹</option><option>إسبانيا 🇪🇸</option><option>هولندا 🇳🇱</option>
+              <option>بلجيكا 🇧🇪</option><option>سويسرا 🇨🇭</option><option>السويد 🇸🇪</option>
+              <option>النرويج 🇳🇴</option><option>الدنمارك 🇩🇰</option><option>بولندا 🇵🇱</option>
+              <option>رومانيا 🇷🇴</option><option>اليونان 🇬🇷</option><option>البرتغال 🇵🇹</option>
+              <option>النمسا 🇦🇹</option><option>تشيكيا 🇨🇿</option><option>المجر 🇭🇺</option>
+              <option>فنلندا 🇫🇮</option><option>أيرلندا 🇮🇪</option>
+            </optgroup>
+            <optgroup label="آسيا">
+              <option>الصين 🇨🇳</option><option>اليابان 🇯🇵</option><option>الهند 🇮🇳</option>
+              <option>كوريا الجنوبية 🇰🇷</option><option>إندونيسيا 🇮🇩</option><option>تايلاند 🇹🇭</option>
+              <option>ماليزيا 🇲🇾</option><option>سنغافورة 🇸🇬</option><option>فيتنام 🇻🇳</option>
+              <option>الفلبين 🇵🇭</option><option>باكستان 🇵🇰</option><option>بنغلاديش 🇧🇩</option>
+              <option>تركيا 🇹🇷</option><option>إيران 🇮🇷</option><option>إسرائيل 🇮🇱</option>
+              <option>هونغ كونغ 🇭🇰</option><option>تايوان 🇹🇼</option><option>كازاخستان 🇰🇿</option>
+            </optgroup>
+            <optgroup label="أمريكا الشمالية">
+              <option>الولايات المتحدة 🇺🇸</option><option>كندا 🇨🇦</option><option>المكسيك 🇲🇽</option>
+            </optgroup>
+            <optgroup label="أمريكا اللاتينية">
+              <option>البرازيل 🇧🇷</option><option>الأرجنتين 🇦🇷</option><option>كولومبيا 🇨🇴</option>
+              <option>تشيلي 🇨🇱</option><option>بيرو 🇵🇪</option><option>فنزويلا 🇻🇪</option>
+            </optgroup>
+            <optgroup label="أفريقيا">
+              <option>نيجيريا 🇳🇬</option><option>جنوب أفريقيا 🇿🇦</option><option>كينيا 🇰🇪</option>
+              <option>إثيوبيا 🇪🇹</option><option>غانا 🇬🇭</option><option>تنزانيا 🇹🇿</option>
+            </optgroup>
+            <optgroup label="أوقيانوسيا">
+              <option>أستراليا 🇦🇺</option><option>نيوزيلندا 🇳🇿</option>
+            </optgroup>
+            <optgroup label="روسيا وآسيا الوسطى">
+              <option>روسيا 🇷🇺</option><option>أوكرانيا 🇺🇦</option><option>أوزبكستان 🇺🇿</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>كود الدولة</label>
+          <select id="phoneCode">
+            <option value="+20">🇪🇬 +20</option><option value="+966">🇸🇦 +966</option>
+            <option value="+971">🇦🇪 +971</option><option value="+965">🇰🇼 +965</option>
+            <option value="+974">🇶🇦 +974</option><option value="+973">🇧🇭 +973</option>
+            <option value="+968">🇴🇲 +968</option><option value="+962">🇯🇴 +962</option>
+            <option value="+961">🇱🇧 +961</option><option value="+964">🇮🇶 +964</option>
+            <option value="+1">🇺🇸 +1</option><option value="+44">🇬🇧 +44</option>
+            <option value="+49">🇩🇪 +49</option><option value="+33">🇫🇷 +33</option>
+            <option value="+81">🇯🇵 +81</option><option value="+86">🇨🇳 +86</option>
+            <option value="+91">🇮🇳 +91</option><option value="+55">🇧🇷 +55</option>
+            <option value="+7">🇷🇺 +7</option><option value="+61">🇦🇺 +61</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>رقم الهاتف</label>
+        <input type="tel" placeholder="0100 000 0000" />
+      </div>
+      <div class="form-group">
+        <label>البريد الإلكتروني</label>
+        <input type="email" placeholder="example@email.com" />
+      </div>
+      <div class="form-group">
+        <label>كلمة المرور</label>
+        <input type="password" placeholder="••••••••" />
+      </div>
+      <button class="btn-login" onclick="goToDash()">
+        إنشاء الحساب والدخول
+      </button>
+      <div class="login-footer">
+        لديك حساب بالفعل؟ <a href="#">تسجيل الدخول</a>
+        <br/><br/>
+        <small style="color:var(--text-muted)">التداول ينطوي على مخاطر — تأكد من فهمك للمخاطر قبل الاستثمار</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE 2: DASHBOARD ===== -->
+<div id="dashPage" class="page">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">FP</div>
+
+    <div class="nav-icon active" title="">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="tooltip">لوحة التحكم</span>
+    </div>
+    <div class="nav-icon" onclick="this.parentElement.querySelectorAll('.nav-icon').forEach(x=>x.classList.remove('active'));this.classList.add('active')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+      <span class="tooltip">التداول المباشر</span>
+    </div>
+    <div class="nav-icon" onclick="this.parentElement.querySelectorAll('.nav-icon').forEach(x=>x.classList.remove('active'));this.classList.add('active')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      <span class="tooltip">السجل</span>
+    </div>
+    <div class="nav-icon" onclick="this.parentElement.querySelectorAll('.nav-icon').forEach(x=>x.classList.remove('active'));this.classList.add('active')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3h18v18H3z" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      <span class="tooltip">المحفظة</span>
+    </div>
+    <div class="nav-icon" onclick="this.parentElement.querySelectorAll('.nav-icon').forEach(x=>x.classList.remove('active'));this.classList.add('active')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+      <span class="tooltip">التحليل</span>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="nav-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+      <span class="tooltip">الأخبار</span>
+    </div>
+    <div class="nav-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="tooltip">الإشعارات</span>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-divider"></div>
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        <span class="tooltip">الحساب</span>
+      </div>
+      <div class="nav-icon" style="color:var(--red)" onclick="goToLogin()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span class="tooltip">خروج</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main-content">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:0.6rem">
+        <div class="live-dot"></div>
+        <span style="font-size:0.75rem;color:var(--text-secondary)">الأسواق مفتوحة</span>
+      </div>
+      <div class="topbar-brand" style="margin:0 auto">FOREXPRO</div>
+      <div class="topbar-right">
+        <div class="topbar-badge">حساب VIP</div>
+        <div class="topbar-user">
+          <div class="user-avatar" id="avatarInitials">م أ</div>
+          <div class="user-name" id="welcomeUser">أهلاً، متداول</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BANNER -->
+    <div class="banner-section">
+      <div class="banner-tabs">
+        <button class="banner-tab active">العروض</button>
+        <button class="banner-tab" onclick="switchTab(this,'banner2')">التداول الذكي</button>
+        <button class="banner-tab" onclick="switchTab(this,'banner3')">التعليم</button>
+      </div>
+      <div class="banner" id="banner1">
+        <div class="banner-text">
+          <h2>ابدأ التداول الاحترافي<br><span>بدون عمولات</span></h2>
+          <p>سبريد من 0.0 pip على أكثر من 250 زوج عملات</p>
+          <div class="banner-actions">
+            <button class="btn-primary">ابدأ الآن</button>
+            <button class="btn-outline">حساب تجريبي</button>
+          </div>
+        </div>
+        <div class="banner-stat">
+          <div class="val">250+</div>
+          <div class="lbl">زوج عملات متاح</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT GRID -->
+    <div class="content-grid">
+      <div class="left-col">
+
+        <!-- STATS -->
+        <div>
+          <div class="section-title">نظرة عامة على حسابك</div>
+          <div class="stats-row">
+            <div class="stat-card gold">
+              <div class="s-label">الرصيد الكلي</div>
+              <div class="s-val">$12,480</div>
+              <div class="s-change up">▲ +$340 اليوم</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="s-label">الهامش المتاح</div>
+              <div class="s-val">$8,920</div>
+              <div class="s-change" style="color:var(--text-muted)">71.5% من الرصيد</div>
+            </div>
+            <div class="stat-card green">
+              <div class="s-label">الربح / الخسارة</div>
+              <div class="s-val">+$340</div>
+              <div class="s-change up">▲ +2.8%</div>
+            </div>
+            <div class="stat-card">
+              <div class="s-label">الصفقات المفتوحة</div>
+              <div class="s-val" style="color:var(--text-primary)">7</div>
+              <div class="s-change" style="color:var(--text-muted)">3 رابحة • 4 خاسرة</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHART -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">EUR / USD</div>
+              <div class="chart-pair">يورو / دولار أمريكي</div>
+            </div>
+            <div style="display:flex;gap:0.5rem;align-items:center">
+              <span style="font-size:1.4rem;font-family:'Oswald',sans-serif;font-weight:700;color:var(--text-primary)">1.0847</span>
+              <span class="up" style="font-size:0.8rem;font-weight:700">▲ +0.12%</span>
+            </div>
+          </div>
+          <div class="chart-body">
+            <svg class="chart-svg" viewBox="0 0 600 160" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#00C9A7" stop-opacity="0.3"/>
+                  <stop offset="100%" stop-color="#00C9A7" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M0,120 C20,115 40,125 60,110 C80,95 100,105 120,90 C140,75 160,100 180,85 C200,70 220,80 240,65 C260,50 280,75 300,60 C320,45 340,70 360,55 C380,40 400,65 420,50 C440,35 460,55 480,45 C500,35 520,50 540,38 C560,26 580,35 600,28" 
+                    fill="url(#chartGrad)" stroke="none"/>
+              <path d="M0,120 C20,115 40,125 60,110 C80,95 100,105 120,90 C140,75 160,100 180,85 C200,70 220,80 240,65 C260,50 280,75 300,60 C320,45 340,70 360,55 C380,40 400,65 420,50 C440,35 460,55 480,45 C500,35 520,50 540,38 C560,26 580,35 600,28" 
+                    fill="none" stroke="#00C9A7" stroke-width="2"/>
+              <line x1="480" y1="0" x2="480" y2="160" stroke="rgba(201,168,76,0.3)" stroke-width="1" stroke-dasharray="4,4"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- MARKET TABLE -->
+        <div class="chart-card">
+          <div class="section-title">الأسواق المباشرة</div>
+          <table class="market-table">
+            <thead>
+              <tr>
+                <th>الزوج</th><th>السعر</th><th>التغيير</th><th>السبريد</th><th>شراء</th><th>بيع</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="pair-flag">🇪🇺</span><span class="pair-name">EUR/USD</span></td>
+                <td class="price-cell">1.08470</td>
+                <td class="up">+0.12%</td>
+                <td class="spread">0.9</td>
+                <td><button class="buy-btn">شراء</button></td>
+                <td><button class="sell-btn">بيع</button></td>
+              </tr>
+              <tr>
+                <td><span class="pair-flag">🇬🇧</span><span class="pair-name">GBP/USD</span></td>
+                <td class="price-cell">1.26430</td>
+                <td class="down">-0.08%</td>
+                <td class="spread">1.1</td>
+                <td><button class="buy-btn">شراء</button></td>
+                <td><button class="sell-btn">بيع</button></td>
+              </tr>
+              <tr>
+                <td><span class="pair-flag">🇯🇵</span><span class="pair-name">USD/JPY</span></td>
+                <td class="price-cell">149.720</td>
+                <td class="up">+0.23%</td>
+                <td class="spread">1.3</td>
+                <td><button class="buy-btn">شراء</button></td>
+                <td><button class="sell-btn">بيع</button></td>
+              </tr>
+              <tr>
+                <td><span class="pair-flag">🥇</span><span class="pair-name">XAU/USD</span></td>
+                <td class="price-cell">2338.40</td>
+                <td class="up">+0.54%</td>
+                <td class="spread">2.8</td>
+                <td><button class="buy-btn">شراء</button></td>
+                <td><button class="sell-btn">بيع</button></td>
+              </tr>
+              <tr>
+                <td><span class="pair-flag">🇨🇭</span><span class="pair-name">USD/CHF</span></td>
+                <td class="price-cell">0.90120</td>
+                <td class="down">-0.15%</td>
+                <td class="spread">1.0</td>
+                <td><button class="buy-btn">شراء</button></td>
+                <td><button class="sell-btn">بيع</button></td>
+              </tr>
+              <tr>
+                <td><span class="pair-flag">🇦🇺</span><span class="pair-name">AUD/USD</span></td>
+                <td class="price-cell">0.65210</td>
+                <td class="up">+0.07%</td>
+                <td class="spread">1.2</td>
+                <td><button class="buy-btn">شراء</button></td>
+                <td><button class="sell-btn">بيع</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- AD WIDE -->
+        <div class="ad-card wide">
+          <div class="ad-inner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+            <span>مساحة إعلانية — 728 × 90</span>
+            <span class="ad-label">للتواصل: ads@forexpro.com</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="right-col">
+
+        <!-- AD TALL -->
+        <div class="ad-card tall">
+          <div class="ad-inner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+            <span>مساحة إعلانية</span>
+            <span class="ad-label">300 × 200</span>
+          </div>
+        </div>
+
+        <!-- NEWS -->
+        <div class="news-card">
+          <div class="section-title">آخر الأخبار</div>
+          <div class="news-item">
+            <div class="n-time">منذ 12 دقيقة</div>
+            <div class="n-title">الدولار يتراجع مع تصريحات الاحتياطي الفيدرالي بشأن أسعار الفائدة</div>
+            <div class="n-src">Reuters</div>
+          </div>
+          <div class="news-item">
+            <div class="n-time">منذ 45 دقيقة</div>
+            <div class="n-title">الذهب يكسر مستوى 2,330 دولار وسط توترات جيوسياسية</div>
+            <div class="n-src">Bloomberg</div>
+          </div>
+          <div class="news-item">
+            <div class="n-time">منذ 1 ساعة</div>
+            <div class="n-title">اليورو يصمد أمام التوقعات السلبية للنمو الأوروبي</div>
+            <div class="n-src">FT</div>
+          </div>
+          <div class="news-item">
+            <div class="n-time">منذ 2 ساعة</div>
+            <div class="n-title">اليابان تعلن عن بيانات التضخم التي تفوق التوقعات</div>
+            <div class="n-src">Nikkei</div>
+          </div>
+        </div>
+
+        <!-- AD TALL 2 -->
+        <div class="ad-card tall">
+          <div class="ad-inner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+            <span>مساحة إعلانية</span>
+            <span class="ad-label">300 × 200</span>
+          </div>
+        </div>
+
+        <!-- MINI STATS -->
+        <div class="news-card">
+          <div class="section-title">إحصائياتك</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem">
+            <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:0.8rem;text-align:center">
+              <div style="font-size:1.2rem;font-weight:900;color:var(--green);font-family:'Oswald',sans-serif">67%</div>
+              <div style="font-size:0.68rem;color:var(--text-muted);margin-top:2px">نسبة الفوز</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:0.8rem;text-align:center">
+              <div style="font-size:1.2rem;font-weight:900;color:var(--gold);font-family:'Oswald',sans-serif">142</div>
+              <div style="font-size:0.68rem;color:var(--text-muted);margin-top:2px">إجمالي الصفقات</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:0.8rem;text-align:center">
+              <div style="font-size:1.2rem;font-weight:900;color:var(--teal);font-family:'Oswald',sans-serif">1:2.4</div>
+              <div style="font-size:0.68rem;color:var(--text-muted);margin-top:2px">نسبة ر/خ</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:0.8rem;text-align:center">
+              <div style="font-size:1.2rem;font-weight:900;color:var(--red);font-family:'Oswald',sans-serif">-3.2%</div>
+              <div style="font-size:0.68rem;color:var(--text-muted);margin-top:2px">أقصى تراجع</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SOCIAL FOOTER -->
+    <div class="social-footer">
+      <div class="social-footer-inner">
+        <div>
+          <div class="social-brand">FOREXPRO</div>
+          <div class="social-copy" style="margin-top:0.3rem">منصة التداول الاحترافية · جميع الحقوق محفوظة © 2025</div>
+        </div>
+        <div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.6rem;text-align:center">تابعنا على</div>
+          <div class="social-links">
+            <a class="social-btn fb" href="#" title="Facebook">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+            </a>
+            <a class="social-btn ig" href="#" title="Instagram">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+            </a>
+            <a class="social-btn tg" href="#" title="Telegram">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.93 3.24L2.47 10.75c-1.33.53-1.32 1.27-.24 1.6l4.93 1.54 11.4-7.18c.54-.33 1.03-.15.63.21L9.35 16.17l-.31 4.62c.44 0 .63-.2.88-.44l2.1-2.04 4.36 3.22c.8.44 1.38.21 1.58-.74l2.85-13.47c.3-1.19-.45-1.73-1.88-1.08z"/></svg>
+            </a>
+            <a class="social-btn tk" href="#" title="TikTok">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.36 6.36 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34l-.01-8.07a8.15 8.15 0 0 0 4.77 1.52V5.3a4.85 4.85 0 0 1-1-.61z"/></svg>
+            </a>
+          </div>
+        </div>
+        <div>
+          <div class="social-disclaimer">
+            تحذير المخاطر: التداول في الفوركس والعقود مقابل الفروقات ينطوي على مخاطر عالية وقد يؤدي إلى خسارة رأس المال.
+          </div>
+          <div class="legal-links" style="margin-top:0.5rem">
+            <a href="#">سياسة الخصوصية</a>
+            <a href="#">الشروط والأحكام</a>
+            <a href="#">اتصل بنا</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function goToDash() {
+  document.getElementById('loginPage').classList.remove('active');
+  document.getElementById('dashPage').classList.add('active');
+}
+function goToLogin() {
+  document.getElementById('dashPage').classList.remove('active');
+  document.getElementById('loginPage').classList.add('active');
+}
+function switchTab(btn, id) {
+  document.querySelectorAll('.banner-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// Animate market prices
+setInterval(() => {
+  document.querySelectorAll('.price-cell').forEach(el => {
+    const base = parseFloat(el.textContent);
+    const delta = (Math.random() - 0.5) * 0.0003;
+    el.textContent = (base + delta).toFixed(5);
+  });
+}, 2000);
+</script>
+</body>
+</html>
